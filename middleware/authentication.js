@@ -1,7 +1,7 @@
+/** @format */
+
 const CustomError = require("../errors");
-const {
-  isTokenValid
-} = require("../utils");
+const { isTokenValid } = require("../utils");
 
 const authenticateUser = async (req, res, next) => {
   const token = req.signedCookies.token;
@@ -10,7 +10,7 @@ const authenticateUser = async (req, res, next) => {
   } else {
     try {
       const payload = isTokenValid({
-        token
+        token,
       });
       //Se asigna para que se vaya a las cabeceras, se propague, pero solo en las que
       // el middleware pasa, no hace la cabecera global, solo por las que pasó el middleware
