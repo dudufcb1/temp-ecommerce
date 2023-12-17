@@ -4,13 +4,14 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { number } = require("joi");
+const Review = require("../models/Review");
 
 const ProductSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, "Please provide a name"],
-      maxlenght: [100, "Name can not be more than 100 characters"],
+      maxlength: [100, "Name can not be more than 100 characters"],
     },
     price: {
       type: Number,
@@ -20,7 +21,7 @@ const ProductSchema = new mongoose.Schema(
     description: {
       type: String,
       required: [true, "Please provide a description"],
-      maxlenght: [1000, "Name can not be more than 1000 characters"],
+      maxlength: [1000, "Description can not be more than 1000 characters"],
     },
     image: {
       type: String,
@@ -44,7 +45,7 @@ const ProductSchema = new mongoose.Schema(
       default: ["All"],
       required: true,
     },
-    fetured: {
+    featured: {
       type: Boolean,
       default: false,
     },
@@ -54,10 +55,14 @@ const ProductSchema = new mongoose.Schema(
     },
     inventory: {
       type: Number,
-      required: [true, "Please provide a description"],
+      required: [true, "Please provide an inventory"],
       default: 15,
     },
     averageRating: {
+      type: Number,
+      default: 0,
+    },
+    numberOfReviews: {
       type: Number,
       default: 0,
     },
@@ -69,7 +74,39 @@ const ProductSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
+// Virtual solo permite obtener el total de registros, no es flexible a la hora de hacer queries específicamente de uno y otro registro
+ProductSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id", // que exportamos a "reviews"
+  foreignField: "product", // como se llama _id de aquí, allá en reviews
+  justOne: false,
+});
+
+//Se importa el model, y se usa this._conditions no funciona el this._id normal
+ProductSchema.pre("findOneAndDelete", async function (next) {
+  console.log(this._conditions._id);
+  await Review.deleteMany({ product: this._conditions._id });
+});
+
 module.exports = mongoose.model("Product", ProductSchema);
+
+/* ProductSchema.post("findOneAndDelete", async function (doc) {
+  console.log("vine por aqui");
+  if (doc) {
+    console.log(doc);
+    const productId = doc._id;
+
+    try {
+      // Elimina todas las reviews asociadas al producto
+      await Review.deleteMany({ product: productId });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+});
+ */

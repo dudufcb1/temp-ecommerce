@@ -20,14 +20,14 @@ const createProduct = async (req, res) => {
 };
 
 getAllProducts = async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}).populate("reviews");
   res.status(StatusCodes.OK).json({ products, count: products.length });
 };
 
 getSingleProduct = async (req, res) => {
   console.log("Aca ando");
   const { id: productId } = req.params;
-  const product = await Product.findOne({ _id: productId });
+  const product = await Product.findOne({ _id: productId }).populate("reviews");
   if (!product) {
     //este error salta, si el formato del ID de mongo es correcto, de otra forma, te tira el cast que
     // manejamos desde errorhandlermiddleware
@@ -56,13 +56,14 @@ updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   const { id: productId } = req.params;
   const product = await Product.findOne({ _id: productId });
+
   if (!product) {
-    //este error salta, si el formato del ID de mongo es correcto, de otra forma, te tira el cast que
-    // manejamos desde errorhandlermiddleware
     throw new CustomError.NotFoundError(`No product ${productId} found`);
   }
-  await product.deleteOne({ _id: productId });
-  res.status(StatusCodes.OK).json({ msg: "Sucess! product removed" });
+  // Utiliza findOneAndDelete en lugar de findOneAndRemove
+  await Product.findOneAndDelete({ _id: productId });
+
+  res.status(StatusCodes.OK).json({ msg: "Success! Product removed" });
 };
 
 const uploadImage = async (req, res) => {

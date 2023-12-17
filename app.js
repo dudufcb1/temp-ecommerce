@@ -11,6 +11,8 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const productRouter = require("./routes/productRoutes");
+const orderRouter = require("./routes/orderRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
@@ -38,6 +40,8 @@ app.get("/api/v1", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/orders", orderRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
