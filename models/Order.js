@@ -1,11 +1,11 @@
 /** @format */
 
 const mongoose = require("mongoose");
-const SingleCartSchema = mongoose.Schema({
-  name: { type: String, require: true },
-  image: { type: String, require: true },
-  price: { type: Number, require: true },
-  amount: { type: Number, require: true },
+const SingleOrderItemSchema = mongoose.Schema({
+  name: { type: String, required: true },
+  image: { type: String, required: true },
+  price: { type: Number, required: true },
+  amount: { type: Number, required: true },
   product: {
     type: mongoose.Schema.ObjectId,
     ref: "Product",
@@ -23,7 +23,7 @@ const OrderSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    subtotal: {
+    subTotal: {
       type: Number,
       required: true,
     },
@@ -31,7 +31,7 @@ const OrderSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    cartItems: [SingleCartSchema],
+    cartItems: [SingleOrderItemSchema],
     status: {
       type: String,
       enum: [
@@ -44,7 +44,7 @@ const OrderSchema = mongoose.Schema(
         "Required Data",
         "Out Of Stock",
       ],
-      default: "pending",
+      default: "Pending",
     },
     user: {
       type: mongoose.Schema.ObjectId,
@@ -57,11 +57,9 @@ const OrderSchema = mongoose.Schema(
     },
     paymentIntentId: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model("Order", OrderSchema);
-module.exports = mongoose.model("SingleCartSchema", SingleCartSchema);
